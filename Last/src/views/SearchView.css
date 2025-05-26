@@ -1,0 +1,68 @@
+.search-view {
+  background-color: rgb(58, 58, 58);
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  color:white;
+}
+.movie-results {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.movie-item {
+  background-color: rgb(32, 32, 32);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.movie-item:hover {
+  transform: scale(1.03);
+  background-color: rgb(44, 44, 44);
+}
+
+.movie-item img {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.movie-item div {
+  margin-top: 10px;
+  color: white;
+}
+
+.pagination {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.pagination button {
+  background-color: rgb(32, 32, 32);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #777;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: rgb(10, 55, 94);
+}
+.genredisp2{
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  padding: 30px;
+}

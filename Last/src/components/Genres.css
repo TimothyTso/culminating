@@ -1,0 +1,26 @@
+.genretag {
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    max-width: 600px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.genretag li {
+    width: 100%;
+    padding: 10px 0;
+    margin-top: 8px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+    
+}
+
+.genretag li:hover {
+    background-color: #555;
+    cursor: pointer;
+    border-radius: 8px;
+}

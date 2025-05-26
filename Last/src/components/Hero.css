@@ -1,0 +1,29 @@
+*{
+    /* Margin zeroes */
+    margin:0px;
+    padding:0px;
+    
+}
+.body{
+    background:black;
+}
+.description{
+    /* Hero section */
+    height: 700px;
+    position: relative;
+    background: url(Background.jpg);
+    background-size: 100%;
+    
+}
+.boxdescript{
+    /* Welcome text in hero */
+    position:absolute;
+    color:white;
+    margin-top:5%;
+    margin-left:2%;
+}
+
+.descr{
+    /* Adjusts hero title size */
+    font-size:50px;
+}

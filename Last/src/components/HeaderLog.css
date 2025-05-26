@@ -1,0 +1,101 @@
+* {
+    /* Margin zeroes */
+    margin: 0px;
+    padding: 0px;
+}
+.menu{
+    /* Creates menu container */
+    width: 100%;
+    height: 7%;
+    position: absolute;
+    background-color: black;
+    color: red;
+    font-size: 150%;
+}
+.title{
+    /* Logo title */
+    position: relative;
+    margin-top: 0px;
+    font-size: 200%;
+    color: red;
+    display: inline-block;
+}
+.welcome{
+    /* Logo title */
+    position: relative;
+    margin-top: 0px;
+    font-size: 200%;
+    color: red;
+    display: inline-block;
+    margin-left:5%;
+}
+.buttons{
+    /* Button container */
+    width: 5%;
+    display: inline-flex;
+    margin-left: 77%;
+    
+}
+.settings{
+    /* Login button */
+    margin-top: 0%;
+    position: relative;
+    background-color: rgb(134, 134, 240);
+    border-radius: 100%;
+    border: none;
+    padding: 5px 15px;
+    margin-right:1%;
+}
+.settings:hover{
+    /* Login button color change */
+    background-color: white;
+}
+.cart{
+    /* Register button */
+    margin-top: 0%;
+    position: relative;
+    background-color: rgb(134, 134, 240);
+    border-radius: 100%;
+    border: none;
+    padding: 5px 15px;
+    margin-right: 1%;
+    margin-left: 48%;
+    
+}
+.cart:hover{
+    /* Register button color change*/
+    background-color: white;
+}
+.logout{
+    /* Login button */
+    margin-top: 0%;
+    position: relative;
+    background-color: rgb(134, 134, 240);
+    border-radius: 100%;
+    border: none;
+    padding: 5px 15px;
+    
+}
+.logout:hover{
+    /* Login button color change */
+    background-color: white;
+}
+.searchbar {
+    position: relative;
+    margin-top: 0px;
+    font-size: 100%;
+    color: red;
+    display: inline-block;
+}
+.left-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 20px; /* space between title and search bar */
+}
+
+.searchbar input {
+    font-size: 100%;
+    padding: 5px;
+    margin-left:80%;
+}

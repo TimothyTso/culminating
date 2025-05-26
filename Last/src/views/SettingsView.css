@@ -1,0 +1,131 @@
+.setcontainer {
+    background: url(Background.jpg);
+    background-size: 100%;
+    opacity:0.9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  /* Title styling */
+  .set {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: rgb(237, 232, 232);  /* Changed text color */
+  }
+  
+  /* Form container */
+  .formContainer {
+    opacity:0.95;
+    background-color: black;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    color:white;
+  }
+  
+  /* Form group (labels and input fields) */
+  .formGroup {
+    margin-bottom: 15px;
+  }
+  
+  .formGroup label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;  /* Changed label color */
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  .formGroup input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid rgb(32, 32, 32);  /* Dark border color */
+    border-radius: 4px;
+    background-color: rgb(240, 240, 240);  /* Light background for input fields */
+    color: rgb(58, 58, 58);  /* Dark text color */
+  }
+  
+  .formGroup input:focus {
+    border-color: rgb(0, 170, 113);  /* Focus border color */
+    outline: none;
+  }
+  
+  /* Genres container */
+  .genresContainer {
+    margin-top: 20px;
+  }
+  
+  .genresContainer h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: white;  /* Changed header text color */
+  }
+  
+  /* Checkbox container */
+  .checkboxContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .checkboxContainer div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .checkboxContainer input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+  
+  /* Save Button */
+  .saveButton {
+    padding: 12px 20px;
+    background-color: rgb(78, 44, 158);  /* Dark button background */
+    color: rgb(0, 170, 113);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+    
+  }
+  
+  .saveButton:hover {
+    background-color: rgb(0, 170, 113);  /* Button hover background color */
+    color:rgb(78, 44, 158);
+  }
+  
+  .saveButton:focus {
+    outline: none;
+  }
+  
+  /* Error handling (optional, in case you want to show error message) */
+  .error {
+    color: red;
+    font-size: 1rem;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  /* Optional loading spinner (if you want to add a spinner for async operations) */
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  

@@ -1,0 +1,116 @@
+
+ * {
+    margin: 0px;
+    padding: 0px;
+  }
+  
+  .appcontainer {
+    background-color: rgb(58, 58, 58);
+    color: #e0e0e0;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .moviedetail {
+    margin-top: 20px;
+    margin-left: 50px;
+  }
+  
+  .movietitle {
+    font-size: 2.5rem;
+    color: #8385cf;
+    text-align: center;
+    display:flex;
+  }
+  
+  .movieoverview {
+    display: flex;
+    font-size: 1.1rem;
+    margin-top: 15px;
+    color: #e0e0e0;
+    line-height: 1.6;
+    max-width: 800px;
+    
+  }
+  .movieinfo p {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  .moviedetail-content {
+    display: grid;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .movieposter {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .movieinfo {
+    
+    background-color: rgb(58, 58, 58);
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 8px;
+    color: #e0e0e0;
+  }
+  .trailerssection {
+    display: inline-block;
+    position: relative;
+    flex-grow: 1;
+    margin-top: 30px;
+    color: #b0c8a0;
+    width: 100%;
+  }
+  
+  .trailerssection h2 {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  .trailersgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+  
+  .trailertile {
+    background-color: rgb(58, 58, 58);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    transition: background-color 0.3s;
+  }
+  
+  .trailertile:hover {
+    background-color: #4e4e4e;
+  }
+  
+  .trailerthumbnail {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .trailertile h3 {
+    font-size: 1.2rem;
+    color: #b0c8a0;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .trailertile a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .trailertile a:hover {
+    opacity: 0.8;
+  }
+  
+    /* Reset & Base Styles */
