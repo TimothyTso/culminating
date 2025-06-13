@@ -81,12 +81,12 @@ export default function RegisterView() {
         lastName: userL,
         genres: selectgenrejs
       });
-      console.log(user.uid);
+      
 
       navigate('/movies/genre');  // Navigate to the next page
     } catch (error) {
-      
-      alert("Error creating user.");
+        
+      alert("Error creating user: " + error.message);
       
     }
   };

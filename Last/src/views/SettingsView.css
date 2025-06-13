@@ -10,7 +10,7 @@
   }
   
   /* Title styling */
-  .set {
+  .h1 {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 20px;
@@ -69,6 +69,39 @@
     margin-bottom: 10px;
     color: white;  /* Changed header text color */
   }
+  
+  .cartContainer {
+    color:white;
+    opacity:0.95;
+    background-color: black;
+    margin-top: 30px;
+}
+
+.cartGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.cartTile {
+    background-color: rgb(84, 80, 80);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.cartImage {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.cartTitle {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
   
   /* Checkbox container */
   .checkboxContainer {
