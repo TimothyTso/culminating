@@ -120,8 +120,8 @@ function SettingsView() {
                 setNewFname(user.displayName.split(' ')[0] || ''); 
                 setNewLname(user.displayName.split(' ')[1] || ''); 
             } else {
-                setFirst(newFname);
-                setLast(newLname);
+                setNewFname(newFname);
+                setNewLname(newLname);
             }
     
             try {
