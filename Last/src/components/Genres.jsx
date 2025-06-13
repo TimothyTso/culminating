@@ -1,8 +1,11 @@
 import './../components/Genres.css';
+
 function GenreView({ genresList, onGenreClick }) {
+  const genresArray = genresList instanceof Map ? Array.from(genresList.entries()) : genresList;
+
   return (
     <div className="genretag">
-      {genresList.map(([id, name]) => (
+      {genresArray.map(([id, name]) => (
         <ul key={id}>
           <li onClick={() => onGenreClick(id)}>
             {name}
@@ -10,7 +13,7 @@ function GenreView({ genresList, onGenreClick }) {
         </ul>
       ))}
     </div>
-  )
+  );
 }
 
 export default GenreView;

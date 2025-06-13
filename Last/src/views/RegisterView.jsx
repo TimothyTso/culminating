@@ -1,15 +1,19 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from 'react';
 import { useStoreContext } from '../context';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { doc, setDoc } from "firebase/firestore";
+import { firestore } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "../firebase";
 import "./RegisterView.css";
 
 export default function RegisterView() {
 
   const navigate = useNavigate();
-  const { setEmail: setContextEmail, setFirst, setLast, setPassword: setContextPassword, setGenres } = useStoreContext();
-  console.log({ setFirst, setLast, setContextEmail, setContextPassword, setGenres });
-  const [user, setUser] = useState("");
-  const [user2, setUser2] = useState("");
+  const {setUser, setGenres } = useStoreContext();
+  
+  const [userF, setUserF] = useState("");
+  const [userL, setUserL] = useState("");
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const [pass2, setPass2] = useState("");
@@ -42,23 +46,86 @@ export default function RegisterView() {
       return newGenres;
     });
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  
+  const registerByEmail = async (event) => {
+    event.preventDefault();
+    if (pass !== pass2) {
+      alert("Passwords do not match!");
+      return;
+    }
 
-   if (pass != pass2){
-    alert("passwords do not match");
-  }else if (selectedGenres.size<5){
-    alert("select atleast 5 genres");
-  }else{
-    navigate('/movies/genre');
-    setFirst(user);
-    setLast(user2);
-    setContextEmail(mail); 
-    setContextPassword(pass);
-    setGenres(selectedGenres);  
-  }
-}
+    if (selectedGenres.size < 5) {
+      alert("Please select at least 5 genres.");
+      return;
+    }
+
+    try {
+      // Create user with email and password
+      const user = (await createUserWithEmailAndPassword(auth, mail, pass)).user;
+      
+      // Update user profile with first and last name
+      await updateProfile(user, { displayName: `${userF} ${userL}` });
+      
+      setUser(user);  // Set the user in context
+      
+
+      // Store user genres and name in Firestore
+      
+      const selectgenrejs = Object.fromEntries(selectedGenres);
+      
+      const docRef = doc(firestore, "users", user.uid);
+      
+      await setDoc(docRef, {
+
+        uid: user.uid,
+        firstName: userF,
+        lastName: userL,
+        genres: selectgenrejs
+      });
+      console.log(user.uid);
+
+      navigate('/movies/genre');  // Navigate to the next page
+    } catch (error) {
+      
+      alert("Error creating user.");
+      
+    }
+  };
+
+  const registerByGoogle = async () => {
+    if (selectedGenres.size < 5) {
+      alert("Please select at least 5 genres.");
+      return;
+    }
+
+    try {
+      // Register user via Google Auth
+      const userCredential = await signInWithPopup(auth, new GoogleAuthProvider());
+      const user = userCredential.user;
+
+      // Set the user in context
+      setUser(user); 
+      setGenres(selectedGenres);  // Set genres in context
+
+      // Get first and last name from the user object or use empty strings if unavailable
+      const firstName = userF || (user.displayName && user.displayName.split(" ")[0]) || '';
+      const lastName = userL || (user.displayName && user.displayName.split(" ")[1]) || '';
+
+      // Store genres and names in Firestore
+      const selectgenrejs = Object.fromEntries(selectedGenres);
+      const docRef = doc(firestore, "users", user.uid);
+      await setDoc(docRef, {
+        uid: user.uid, 
+        firstName: firstName, 
+        lastName: lastName, 
+        genres: selectgenrejs 
+      });
+
+      navigate('/movies/genre');  // Navigate to the next page
+    } catch (error) {
+      alert("Error creating user with Google!");
+      console.log(error);
+    }
+  };
   
 
   return (
@@ -66,7 +133,7 @@ export default function RegisterView() {
     <div className="register-container">
       <div className="register-form">
         <h2 className="register-title">Register</h2>
-        <form onSubmit={handleSubmit} className="form">
+        <form onSubmit={(e) => registerByEmail(e)} className="form">
           <h2>Select Your Preferred Genres</h2>
 <div className="genre-columns">
   <div className="genre-column">
@@ -108,9 +175,9 @@ export default function RegisterView() {
               type="text"
               name="name1"
               className="form-input"
-              value={user}
+              value={userF}
               required
-              onChange = {(e) => setUser(e.target.value)}
+              onChange = {(e) => setUserF(e.target.value)}
             />
           </div>
           <div className="form-group">
@@ -119,8 +186,8 @@ export default function RegisterView() {
               type="text"
               name="name2"
               className="form-input"
-              value={user2}
-              onChange = {(e) => setUser2(e.target.value)}
+              value={userL}
+              onChange = {(e) => setUserL(e.target.value)}
               required
             />
           </div>
@@ -159,6 +226,9 @@ export default function RegisterView() {
           </div>
           <button type="submit" className="submit-btn">
             Register
+          </button>
+          <button onClick={registerByGoogle} className="g-submit-btn" type="button">
+            Register by Google
           </button>
         </form>
       </div>

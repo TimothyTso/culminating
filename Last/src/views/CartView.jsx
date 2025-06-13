@@ -1,9 +1,37 @@
 import { useStoreContext } from "../context";
 import Header from "./../components/HeaderLog.jsx";
 import Footer from "./../components/Footer.jsx";
+import { firestore } from "../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import "./CartView.css";
+import { useNavigate } from "react-router-dom";
+
 function CartView() {
-  const { cart, setCart, fname } = useStoreContext();
+  const navigate = useNavigate();
+  const { cart, setCart, user } = useStoreContext();
+  const checkout = async () => {
+    if (!cart.size) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    try {
+      const docRef = doc(firestore, "users", user.uid);
+      const userDoc = await getDoc(docRef);
+      const userData = userDoc.data();
+      const userCart = userData.cart || [];
+      const updatedCart = [...userCart, ...Array.from(cart.values())];
+
+      await setDoc(docRef, { cart: updatedCart }, { merge: true });
+      setCart(new Map());
+      localStorage.removeItem(user.uid);
+      alert("Thank you for your purchase!"); //ty message ghere
+      navigate('/movies/genre');
+    } catch (error) {
+      
+      alert("There was an error during checkout.");
+    }
+  };
 return (
 <div className= "cartview">
     <div className= "header">
@@ -26,6 +54,9 @@ return (
           })
         }
       </div>
+      <button className="checkoutButton" onClick={checkout}>
+          Checkout
+        </button>
       <div className= "footer">
         <Footer />
       </div>
