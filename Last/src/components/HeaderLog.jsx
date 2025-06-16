@@ -4,13 +4,15 @@ import { useStoreContext } from '../context';
 import React, { useState, useCallback } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import { set } from "immutable";
 
 function Header() {
   const navigate = useNavigate();
   const { user, setUser, setCart, cart: contextCart } = useStoreContext();
-  const [newFname, setNewFname] = useState(user.displayName)
   const [message, setMessage] = useState("");
 
+  
+console.log(user.displayName);
   function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -57,7 +59,7 @@ function Header() {
     <div>
       <div className="menu"></div>
       <h1 className="title">Poorflix</h1>
-      <h1 className="welcome">Hello {newFname}!</h1>
+      <h1 className="welcome">Hello {(user.displayName.split(' ')[0] || '')}!</h1>
       <button className="cart" onClick={() => navigate('/cart')}>Cart</button>
       <button className="settings" onClick={() => navigate('/settings')}>Settings</button>
       <button className="logout" onClick={logout}>Logout</button>

@@ -2,7 +2,7 @@ import "./SettingsView.css";
 import { useState, useEffect } from "react";
 import { useStoreContext } from "../context";
 import { useNavigate } from 'react-router-dom';
-import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider, updateProfile } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { firestore } from "../firebase";
 
@@ -21,24 +21,26 @@ const availableGenres = [
 ];
 
 function SettingsView() {
-    const {  genres, user, setGenres } = useStoreContext();
-    const [newFname, setNewFname] = useState(user.displayName.split(' ')[0] || '');
-    const [newLname, setNewLname] = useState(user.displayName.split(' ')[1] || '');
+    const { genres, user, setGenres, setUser } = useStoreContext();
+    const [newFname, setNewFname] = useState(user.displayName?.split(' ')[0] || '');
+    const [newLname, setNewLname] = useState(user.displayName?.split(' ')[1] || '');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [selectedGenres, setSelectedGenres] = useState(new Map());
     const [passwordError, setPasswordError] = useState('');
     const [genreError, setGenreError] = useState('');
-    const [cart, setCart] = useState([]); 
+    const [cart, setCart] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Initialize selectedGenres from context and Firestore user data
         const initGenres = new Map();
         genres.forEach((value, key) => {
-    initGenres.set(String(key), value);
+            initGenres.set(String(key), value);
         });
         setSelectedGenres(initGenres);
+
         const fetchUserData = async () => {
             if (user) {
                 try {
@@ -47,12 +49,13 @@ function SettingsView() {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         if (data.genres) {
-                            const userGenres = new Map(Object.entries(data.genres)); // keys are strings here
-                            setSelectedGenres(userGenres); 
+                            const userGenres = new Map(Object.entries(data.genres));
+                            setSelectedGenres(userGenres);
+                            setGenres(userGenres); // update context genres with fetched data
                         }
                         if (data.cart) {
                             setCart(data.cart);
-                        } 
+                        }
                         if (data.firstName) setNewFname(data.firstName);
                         if (data.lastName) setNewLname(data.lastName);
                     }
@@ -62,78 +65,122 @@ function SettingsView() {
             }
         };
         fetchUserData();
-    }, [genres, user]);
-    
-    const handleGenreChange = async (event) => {
-            const genreId = event.target.value; // string
-            const genreName = event.target.name;
-            const updatedSelectedGenres = new Map(selectedGenres);
+    }, [genres, user, setGenres]);
 
-            if (event.target.checked) {
-                updatedSelectedGenres.set(genreId, genreName); 
-                } else {
-                updatedSelectedGenres.delete(genreId); 
-                }
-            setSelectedGenres(updatedSelectedGenres);
-            }
-    
-        
-    
-        const handleSaveChanges = async () => {
-            const auth = getAuth();
-            const userCred = auth.currentUser;
-    
-            if (newPassword !== confirmPassword) {
-                setPasswordError('Passwords do not match!');
-                return;
-            }
-    
-            if (!currentPassword) {
-                setPasswordError('Please enter your current password.');
-                return;
-            }
-    
-            const credential = EmailAuthProvider.credential(userCred.email, currentPassword); // Use current password for re-authentication
-    
-            // Check if at least 5 genres are selected
-            if (selectedGenres.size < 5) {
-                setGenreError("You must select at least 5 genres.");
-                return;
-            } else {
-                setGenreError(""); // Clear error if condition is met
-            }
-    
+    const handleGenreChange = (event) => {
+        const genreId = event.target.value; // string
+        const genreName = event.target.name;
+        const updatedSelectedGenres = new Map(selectedGenres);
+
+        if (event.target.checked) {
+            updatedSelectedGenres.set(genreId, genreName);
+        } else {
+            updatedSelectedGenres.delete(genreId);
+        }
+        setSelectedGenres(updatedSelectedGenres);
+    };
+
+    const handlePasswordChange = async () => {
+        setPasswordError(''); // reset error
+        const auth = getAuth();
+        const userCred = auth.currentUser;
+
+        if (!currentPassword) {
+            setPasswordError('Please enter your current password.');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            setPasswordError('Passwords do not match!');
+            return;
+        }
+
+        if (!newPassword) {
+            setPasswordError('Please enter a new password.');
+            return;
+        }
+
+        try {
+            const credential = EmailAuthProvider.credential(userCred.email, currentPassword);
+            await reauthenticateWithCredential(userCred, credential);
+            await updatePassword(userCred, newPassword);
+            alert("Password updated successfully!");
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (error) {
+            console.error("Error updating password:", error);
+            setPasswordError("Error updating password. Please check your current password.");
+        }
+    };
+
+    const handleSaveChanges = async () => {
+        setGenreError('');
+        setPasswordError('');
+
+        // Validate genres selection
+        if (selectedGenres.size < 5) {
+            setGenreError("You must select at least 5 genres.");
+            return;
+        }
+
+        const auth = getAuth();
+        const userCred = auth.currentUser;
+
+        // Only email/password users can update name
+        if (user.providerData[0].providerId !== "password") {
+            alert("Only email/password users can update their name.");
+            // We can still allow genre update below, so don't return here
+        }
+
+        try {
+            // Update Firestore genres and names (if allowed)
+            const userRef = doc(firestore, "users", user.uid);
             const updatedGenres = Object.fromEntries(selectedGenres);
-            if (user.providerData[0].providerId === "google.com") {
-                setNewFname(user.displayName.split(' ')[0] || ''); 
-                setNewLname(user.displayName.split(' ')[1] || ''); 
-            } else {
-                setNewFname(newFname);
-                setNewLname(newLname);
+
+            // Prepare update payload
+            const updatePayload = {
+                genres: updatedGenres,
+            };
+
+            // Update names only if email/password user
+            if (user.providerData[0].providerId === "password") {
+                updatePayload.firstName = newFname;
+                updatePayload.lastName = newLname;
             }
-    
-            try {
-                const userRef = doc(firestore, "users", user.uid);
-                await reauthenticateWithCredential(userCred, credential);
-                await updatePassword(userCred, newPassword);
-                setCurrentPassword('');
-                setNewPassword('');
-                setConfirmPassword('');
-                await updateDoc(userRef, {
-                    genres: updatedGenres, // Save selected genres to Firestore
+
+            await updateDoc(userRef, updatePayload, { merge: true });
+
+            // Update React Context genres
+            setGenres(selectedGenres);
+
+            // Update Firebase Auth displayName for email/password users if changed
+            if (
+                user.providerData[0].providerId === "password" &&
+                `${newFname} ${newLname}` !== user.displayName
+            ) {
+                await updateProfile(userCred, {
+                    displayName: `${newFname} ${newLname}`
+                });
+                // Update context user as well
+                setUser({
+                    ...user,
+                    displayName: `${newFname} ${newLname}`,
                     firstName: newFname,
                     lastName: newLname,
-                }, { merge: true });
-                alert("Settings updated successfully!");
-                navigate('/movies/genre');
-            } catch (error) {
-                console.error("Error updating Firestore:" + error.message);
-                setPasswordError("Error updating password. Please check your current password.");
+                });
             }
-        };
+
+            alert("Settings updated successfully!");
+            navigate('/movies/genre');
+        } catch (error) {
+            console.error("Error updating Firestore or profile:", error);
+            setPasswordError("Error updating settings. Please try again.");
+        }
+    };
 
     function loadMovie(id) {
-    navigate(`/movies/${id}`);
+        navigate(`/movies/${id}`);
     }
 
     return (
@@ -141,8 +188,8 @@ function SettingsView() {
             <h1>Welcome {newFname} {newLname}, Email: {user.email}</h1>
 
             <div className="formContainer">
-                {/* Conditionally Render First Name and Last Name Fields */}
-                {user.providerData[0].providerId !== "google.com" && (
+                {/* Edit First Name and Last Name - only for email/password users */}
+                {user.providerData[0].providerId === "password" && (
                     <>
                         <div className="formGroup">
                             <label>Edit First Name:</label>
@@ -162,8 +209,8 @@ function SettingsView() {
                         </div>
                     </>
                 )}
-                
-                {/* Edit Password Section - Only for email users */}
+
+                {/* Edit Password Section - only for email/password users */}
                 {user.providerData[0].providerId === "password" && (
                     <>
                         <div className="formGroup">
@@ -196,10 +243,9 @@ function SettingsView() {
                     </>
                 )}
 
-                {/* Display password errors */}
                 {passwordError && <div className="error">{passwordError}</div>}
 
-                {/* Genres Selection */}
+                {/* Genre Selection - all users can update */}
                 <div className="genresContainer">
                     <h3>Choose Your Genres</h3>
                     <div className="checkboxContainer">
@@ -210,8 +256,8 @@ function SettingsView() {
                                     id={genre.name}
                                     name={genre.name}
                                     value={genre.id}
-                                    checked={selectedGenres.has(String(genre.id))}  // Pre-select if the genre is in selectedGenres
-                                    onChange={handleGenreChange} // Update on change (select or deselect)
+                                    checked={selectedGenres.has(String(genre.id))}
+                                    onChange={handleGenreChange}
                                 />
                                 <label htmlFor={genre.name}>{genre.name}</label>
                             </div>
@@ -224,7 +270,12 @@ function SettingsView() {
                     Save Changes
                 </button>
 
-                
+                {/* Password update button only for email/password users */}
+                {user.providerData[0].providerId === "password" && (
+                    <button className="saveButton" onClick={handlePasswordChange}>
+                        Update Password
+                    </button>
+                )}
             </div>
 
             {/* Cart Display */}
@@ -238,9 +289,7 @@ function SettingsView() {
                                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                                     alt={movie.title}
                                     className="cartImage"
-                                    onClick={() => {
-                                    loadMovie(movie.id);
-                                    }}
+                                    onClick={() => loadMovie(movie.id)}
                                 />
                                 <h4 className="cartTitle">{movie.title}</h4>
                             </div>
