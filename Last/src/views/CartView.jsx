@@ -40,7 +40,7 @@ return (
     
     <div className= "cartitems">
         {
-          cart.entrySeq().map(([key, value]) => {
+          Array.from(cart.entries()).map(([key, value]) => {
             return (
               <div className="cartitem" key={key}>
                 <img

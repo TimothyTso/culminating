@@ -83,6 +83,7 @@
 .searchbar {
     position: relative;
     margin-top: 0px;
+    padding: 0px;
     font-size: 100%;
     color: red;
     display: inline-block;

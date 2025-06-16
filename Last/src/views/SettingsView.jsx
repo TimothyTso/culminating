@@ -63,7 +63,7 @@ function SettingsView() {
         };
         fetchUserData();
     }, [genres, user]);
-
+    
     const handleGenreChange = async (event) => {
             const genreId = event.target.value; // string
             const genreName = event.target.name;
@@ -77,7 +77,9 @@ function SettingsView() {
             setSelectedGenres(updatedSelectedGenres);
             }
     
-        const handlePasswordChange = async () => {
+        
+    
+        const handleSaveChanges = async () => {
             const auth = getAuth();
             const userCred = auth.currentUser;
     
@@ -93,20 +95,6 @@ function SettingsView() {
     
             const credential = EmailAuthProvider.credential(userCred.email, currentPassword); // Use current password for re-authentication
     
-            try {
-                await reauthenticateWithCredential(userCred, credential);
-                await updatePassword(userCred, newPassword);
-                alert("Password updated successfully!");
-                setCurrentPassword('');
-                setNewPassword('');
-                setConfirmPassword('');
-            } catch (error) {
-                console.error("Error updating password:", error);
-                setPasswordError("Error updating password. Please check your current password.");
-            }
-        };
-    
-        const handleSaveChanges = async () => {
             // Check if at least 5 genres are selected
             if (selectedGenres.size < 5) {
                 setGenreError("You must select at least 5 genres.");
@@ -126,6 +114,11 @@ function SettingsView() {
     
             try {
                 const userRef = doc(firestore, "users", user.uid);
+                await reauthenticateWithCredential(userCred, credential);
+                await updatePassword(userCred, newPassword);
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
                 await updateDoc(userRef, {
                     genres: updatedGenres, // Save selected genres to Firestore
                     firstName: newFname,
@@ -135,10 +128,13 @@ function SettingsView() {
                 navigate('/movies/genre');
             } catch (error) {
                 console.error("Error updating Firestore:" + error.message);
+                setPasswordError("Error updating password. Please check your current password.");
             }
         };
 
-    
+    function loadMovie(id) {
+    navigate(`/movies/${id}`);
+    }
 
     return (
         <div className="setcontainer">
@@ -228,11 +224,7 @@ function SettingsView() {
                     Save Changes
                 </button>
 
-                {user.providerData[0].providerId === "password" && (
-                    <button className="saveButton" onClick={handlePasswordChange}>
-                        Update Password
-                    </button>
-                )}
+                
             </div>
 
             {/* Cart Display */}
@@ -246,6 +238,9 @@ function SettingsView() {
                                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                                     alt={movie.title}
                                     className="cartImage"
+                                    onClick={() => {
+                                    loadMovie(movie.id);
+                                    }}
                                 />
                                 <h4 className="cartTitle">{movie.title}</h4>
                             </div>

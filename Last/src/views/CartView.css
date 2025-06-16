@@ -2,6 +2,21 @@
 .header{
     width:100%
 }
+.checkoutButton{
+    /* Login button */
+    margin-top: 30%;
+    position:relative;
+    background-color: rgb(134, 134, 240);
+    border-radius: 100%;
+    border: none;
+    padding: 5px 15px;
+    
+    
+}
+.checkoutButton:hover {
+    /* Login button color change */
+    background-color: white;
+}
 .cartview {
     background-color: rgb(58, 58, 58); /* Match appcontainer background */ 
     min-height: 100vh;
@@ -71,5 +86,5 @@
     background-color: #b61111;
 }
 .footer{
-    width: 100%
+    width: 100%;
 }
