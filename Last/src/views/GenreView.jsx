@@ -21,7 +21,7 @@ function GenreLogin() {
   
   const cartAdd = (movie) => {
     if (userCart.has(movie.id)) {
-      alert("This movie is already in your cart.");
+      alert("This movie is already purchased.");
     } else {
       addToCart(movie);
     }

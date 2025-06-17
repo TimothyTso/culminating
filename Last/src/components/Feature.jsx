@@ -36,9 +36,7 @@ function Feature() {
                         <div className="moviebox" key={movie.id}>
                             <img className="movieposter" src={movieImage} alt={movie.title} />
                             <h3>{movie.title}</h3>
-                            <div className="detailbut">
-                                <Link to={`/movies/` + movie.id} className="dbutton">Details</Link>
-                            </div>
+                            
                         </div>
                     )})}
             </div>
