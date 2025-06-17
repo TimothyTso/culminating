@@ -11,8 +11,6 @@ function Header() {
   const { user, setUser, setCart, cart: contextCart } = useStoreContext();
   const [message, setMessage] = useState("");
 
-  
-console.log(user.displayName);
   function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -24,8 +22,7 @@ console.log(user.displayName);
   }
   function logout() {
     if (user) {
-      localStorage.removeItem(user.uid);  //ASK IF NEEEDED WILL CLEAR CART ON LOGOUT
-      console.log("User data removed from localStorage");
+      localStorage.removeItem(user.uid);
     }
 
     signOut(auth)
@@ -34,7 +31,7 @@ console.log(user.displayName);
         setCart(new Map());
 
         navigate("/")
-        console.log("Logged out successfully");
+        location.reload(); 
       })
       .catch((error) => {
         console.error("Error during logout:", error);
@@ -44,6 +41,7 @@ console.log(user.displayName);
     debounce((query) => {
       if (query.trim()) {
         navigate(`/movies/search?query=${encodeURIComponent(query)}`);
+        location.reload();
       }
     }, 400),
     [navigate]
@@ -61,7 +59,15 @@ console.log(user.displayName);
       <h1 className="title">Poorflix</h1>
       <h1 className="welcome">Hello {(user.displayName.split(' ')[0] || '')}!</h1>
       <button className="cart" onClick={() => navigate('/cart')}>Cart</button>
-      <button className="settings" onClick={() => navigate('/settings')}>Settings</button>
+      <button
+        className="settings"
+        onClick={() => {
+        navigate('/settings');
+        location.reload();
+      }}>
+        Settings
+      </button>
+
       <button className="logout" onClick={logout}>Logout</button>
       <div className="searchbar">
         <div className="mess">

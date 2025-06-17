@@ -10,11 +10,14 @@
   }
   
   /* Title styling */
-  .h1 {
+  .ti {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 20px;
-    color: rgb(237, 232, 232);  /* Changed text color */
+    color: rgb(78, 44, 158);
+    background-color:black;
+    border-radius:15%;  /* Changed text color */
+    opacity:0.95;
   }
   
   /* Form container */

@@ -16,20 +16,19 @@ export default function LoginView() {
     try {
       const user = (await signInWithEmailAndPassword(auth, email.current.value, upassword)).user;
       navigate('/movies/genre');
+      location.reload();
       
     } catch (error) {
-      console.log(error);
       alert(`Error signing in: ${error.message}`);
-      console.log(upassword);
     }
   }
   async function loginByGoogle() {
     try {
       const user = (await signInWithPopup(auth, new GoogleAuthProvider())).user;
       navigate('/movies/genre');
+      location.reload();
       
     } catch (error) {
-      console.log(error);
       alert(`Error signing in: ${error.message}`);
       
     }

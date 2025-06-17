@@ -83,7 +83,8 @@ export default function RegisterView() {
       });
       
 
-      navigate('/movies/genre');  // Navigate to the next page
+      navigate('/movies/genre');
+      location.reload();
     } catch (error) {
         
       alert("Error creating user: " + error.message);
@@ -120,10 +121,10 @@ export default function RegisterView() {
         genres: selectgenrejs 
       });
 
-      navigate('/movies/genre');  // Navigate to the next page
+      navigate('/movies/genre');
+      location.reload();
     } catch (error) {
       alert("Error creating user with Google!");
-      console.log(error);
     }
   };
   

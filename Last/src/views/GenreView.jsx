@@ -33,7 +33,6 @@ function GenreLogin() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log("User data from Firestore:", data);
   
           if (Array.isArray(data.genres)) {
             setUserGenres(new Map(data.genres.map(genre => [genre.id, genre.name])));
@@ -83,6 +82,7 @@ function GenreLogin() {
 
   function loadMovie(id) {
     navigate(`/movies/${id}`);
+    location.reload();
   }
 
   

@@ -27,6 +27,7 @@ function CartView() {
       localStorage.removeItem(user.uid);
       alert("Thank you for your purchase!"); //ty message ghere
       navigate('/movies/genre');
+      location.reload();
     } catch (error) {
       
       alert("There was an error during checkout.");

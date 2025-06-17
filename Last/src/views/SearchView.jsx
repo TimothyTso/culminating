@@ -4,6 +4,8 @@ import axios from 'axios';
 import Header from "./../components/HeaderLog.jsx";
 import Footer from "./../components/Footer.jsx";
 import { useStoreContext } from '../context';
+import { doc, getDoc } from "firebase/firestore";
+import { firestore } from "../firebase";
 import "./SearchView.css";
 
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_KEY;
@@ -18,12 +20,14 @@ const SearchView = () => {
   const [page, setPage] = useState(pageParam);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-
+  const [userCart, setUserCart] = useState(new Set());
+  
   const debounceTimeout = useRef(null);
   const navigate = useNavigate();
 
-  const { cart, addToCart } = useStoreContext();
+  const { cart, addToCart, user } = useStoreContext();
 
+  // Fetch movies based on search
   const fetchResults = async (query, page) => {
     if (!query) {
       setResults([]);
@@ -50,6 +54,7 @@ const SearchView = () => {
     }
   };
 
+  // Debounced fetch when search params change
   useEffect(() => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
@@ -61,6 +66,29 @@ const SearchView = () => {
 
     return () => clearTimeout(debounceTimeout.current);
   }, [queryParam, pageParam]);
+
+  // Load user's cart from Firestore
+  useEffect(() => {
+    const fetchUserCart = async () => {
+      if (!user?.uid) return;
+
+      try {
+        const docRef = doc(firestore, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.cart) {
+            const movieIdSet = new Set(data.cart.map((movie) => movie.id));
+            setUserCart(movieIdSet);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch user cart:", err);
+      }
+    };
+
+    fetchUserCart();
+  }, [user]);
 
   const handleInputChange = (e) => {
     const newQuery = e.target.value;
@@ -75,11 +103,14 @@ const SearchView = () => {
 
   const loadMovie = (id) => {
     navigate(`/movies/${id}`);
+    location.reload();
   };
 
   const cartAdd = (movie) => {
-    if (cart.has(movie.id)) {
+    if (userCart.has(movie.id)) {
       alert("This movie is already in your cart.");
+    } else if (cart.has(movie.id)) {
+      alert("This movie is already added.");
     } else {
       addToCart(movie);
     }
@@ -90,7 +121,13 @@ const SearchView = () => {
       <Header />
 
       <div className="search-view">
-        
+        <input
+          type="text"
+          value={query}
+          onChange={handleInputChange}
+          placeholder="Search for a movie..."
+          className="searchbar"
+        />
 
         {loading && <p>Loading...</p>}
         {!loading && results.length === 0 && query && <p>No results found.</p>}
@@ -98,10 +135,7 @@ const SearchView = () => {
         <div className="genredisp2">
           {results.map((movie) => (
             <div key={movie.id}>
-              <div
-                className="moviecard"
-                onClick={() => loadMovie(movie.id)}
-              >
+              <div className="moviecard" onClick={() => loadMovie(movie.id)}>
                 {movie.poster_path ? (
                   <img
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -109,18 +143,21 @@ const SearchView = () => {
                     className="movieposter"
                   />
                 ) : (
-                  <div>
-                    <span>No Image</span>
-                  </div>
+                  <div><span>No Image</span></div>
                 )}
                 <h3>{movie.title}</h3>
               </div>
 
-              <button
+              <button 
                 className="butt"
+                disabled={userCart.has(movie.id)}
                 onClick={() => cartAdd(movie)}
               >
-                {cart.has(movie.id) ? "Added" : "Buy"}
+                {userCart.has(movie.id)
+                  ? "Bought"
+                  : cart.has(movie.id)
+                    ? "Added"
+                    : "Buy"}
               </button>
             </div>
           ))}
@@ -129,16 +166,8 @@ const SearchView = () => {
         {!loading && totalPages > 1 && (
           <div className="pageturner">
             <p>
-              <a onClick={() => {
-                if (page > 1) {
-                  goToPage(page - 1);
-                }
-              }}>Previous Page<br /></a>
-              <a onClick={() => {
-                if (page < totalPages) {
-                  goToPage(page + 1);
-                }
-              }}>Next Page</a>
+              <a onClick={() => page > 1 && goToPage(page - 1)}>Previous Page<br /></a>
+              <a onClick={() => page < totalPages && goToPage(page + 1)}>Next Page</a>
             </p>
           </div>
         )}
